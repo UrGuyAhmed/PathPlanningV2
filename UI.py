@@ -6,6 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import copy
 import threading
+from Start import add_start_buttons  
+from twoD import ShowMap2D
 
 root = tk.Tk()
 
@@ -26,11 +28,23 @@ def MainPage():
     title_label.pack(pady=50)
     description_label = tk.Label(root, text="Visualize path planning algorithms on a map.", bg="black", fg="white", font=("Bahnschrift", 16))
     description_label.pack(pady=20)
-    start_button = tk.Button(root, text="Start", bg="gray", fg="white", font=("Bahnschrift", 24), width=10, height=2)
-    start_button.pack(pady=30)
+    add_start_buttons(root, on_2d=ShowMap2D)  
     credit_label = tk.Label(root, text="Created by Ahmed Yacine Ahriche", bg="black", fg="white", font=("Bahnschrift", 10))
     credit_label.pack(side="bottom", pady=5)
-    close_button = tk.Button(root, text="Close", command=root.destroy, bg="gray", fg="white", font=("Bahnschrift", 12), width=10, height=2)
+    close_button = tk.Button(
+        root,
+        text="Close",
+        command=root.destroy,
+        bg="#222222",
+        fg="white",
+        activebackground="#444444",
+        activeforeground="white",
+        font=("Bahnschrift", 12),
+        width=10,
+        height=2,
+        borderwidth=0,
+        highlightthickness=0
+    )
     close_button.pack(side="bottom", pady=10)
 
 
