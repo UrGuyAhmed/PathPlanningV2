@@ -1,16 +1,12 @@
 import tkinter as tk
 from tkinter import filedialog
-import numpy as np
-import cv2
-from PIL import Image, ImageTk
-from Start import add_start_buttons
 
 def clean_up():
     """Clear the main window."""
     for widget in tk._default_root.winfo_children():
         widget.destroy()
 
-def ShowMap2D():
+def ShowMap2D(back_callback=None):
     clean_up()
     root = tk._default_root
 
@@ -38,5 +34,21 @@ def ShowMap2D():
         highlightthickness=0,
         command=upload_action
     )
-    # Place the button in the bottom right corner
     upload_map.place(relx=1.0, rely=1.0, anchor="se", x=-30, y=-30)
+
+    # Back button uses the callback
+    back_btn = tk.Button(
+        root,
+        text="Back",
+        bg="#222222",
+        fg="white",
+        activebackground="#444444",
+        activeforeground="white",
+        font=("Bahnschrift", 14),
+        width=10,
+        height=1,
+        borderwidth=0,
+        highlightthickness=0,
+        command=back_callback if back_callback else root.destroy
+    )
+    back_btn.place(relx=0.0, rely=1.0, anchor="sw", x=30, y=-30)

@@ -1,13 +1,6 @@
 import tkinter as tk
-from tkinter import ttk, filedialog
-import cv2
-from PIL import Image, ImageTk
-import numpy as np
-import matplotlib.pyplot as plt
-import copy
-import threading
-from Start import add_start_buttons  
-from twoD import ShowMap2D
+from Start import add_start_buttons
+
 
 root = tk.Tk()
 
@@ -28,7 +21,14 @@ def MainPage():
     title_label.pack(pady=50)
     description_label = tk.Label(root, text="Visualize path planning algorithms on a map.", bg="black", fg="white", font=("Bahnschrift", 16))
     description_label.pack(pady=20)
-    add_start_buttons(root, on_2d=ShowMap2D)  
+    # Import ShowMap2D and ShowMap3D here to avoid circular import
+    from twoD import ShowMap2D
+    from ThreeD import ShowMap3D
+    add_start_buttons(
+        root,
+        on_2d=lambda: ShowMap2D(back_callback=ShowMainPage),
+        on_3d=lambda: ShowMap3D(back_callback=ShowMainPage)
+    )
     credit_label = tk.Label(root, text="Created by Ahmed Yacine Ahriche", bg="black", fg="white", font=("Bahnschrift", 10))
     credit_label.pack(side="bottom", pady=5)
     close_button = tk.Button(
@@ -46,8 +46,6 @@ def MainPage():
         highlightthickness=0
     )
     close_button.pack(side="bottom", pady=10)
-
-
 
 if __name__ == "__main__":
     MainPage()
