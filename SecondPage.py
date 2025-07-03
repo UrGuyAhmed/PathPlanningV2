@@ -54,4 +54,4 @@ def ShowSecondPage(back_callback=None, continue_callback=None):
     )
     normal_btn.pack(pady=10)
 
-    print(selected_mode)  # Will be 'I' or 'N' after user selection
+    print(f"Selected mode: {selected_mode}")  # Will print 'Selected mode: I' or 'Selected mode: N'

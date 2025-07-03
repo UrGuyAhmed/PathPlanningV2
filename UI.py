@@ -5,6 +5,7 @@ from SecondPage import ShowSecondPage, selected_mode
 
 root = tk.Tk()
 map_holder = MapHolder()  
+
 def ShowMainPage():
     """Return to the main page."""
     for widget in root.winfo_children():
@@ -17,7 +18,7 @@ def ShowFirstPage():
     root.configure(bg="black")
     root.title("Path Planning")
     root.geometry("800x800")
-    title_label = tk.Label(root, text="Welcome", bg="black", fg="white", font=("Bahnschrift", 36))
+    title_label = tk.Label(root, text="Path Planning", bg="black", fg="white", font=("Bahnschrift", 36))
     title_label.pack(pady=50)
     start_button = tk.Button(
         root,
@@ -34,26 +35,6 @@ def ShowFirstPage():
         command=lambda: ShowSecondPage(back_callback=ShowFirstPage, continue_callback=MainPage)
     )
     start_button.pack(pady=30)
-
-def MainPage():
-    """Initialize the main page UI."""
-    for widget in root.winfo_children():
-        widget.destroy()
-    root.configure(bg="black")
-    root.title("Path Planning")
-    root.geometry("800x800")
-    title_label = tk.Label(root, text="Path Planning", bg="black", fg="white", font=("Bahnschrift", 36))
-    title_label.pack(pady=50)
-    description_label = tk.Label(root, text="Visualize path planning algorithms on a map.", bg="black", fg="white", font=("Bahnschrift", 16))
-    description_label.pack(pady=20)
-    # Import ShowMap2D and ShowMap3D here to avoid circular import
-    from twoD import ShowMap2D
-    from ThreeD import ShowMap3D
-    add_start_buttons(
-        root,
-        on_2d=lambda: ShowMap2D(map_holder=map_holder, back_callback=ShowMainPage),  
-        on_3d=lambda: ShowMap3D(back_callback=ShowMainPage)
-    )
     credit_label = tk.Label(root, text="Created by Ahmed Yacine Ahriche", bg="black", fg="white", font=("Bahnschrift", 10))
     credit_label.pack(side="bottom", pady=5)
     close_button = tk.Button(
@@ -72,9 +53,82 @@ def MainPage():
     )
     close_button.pack(side="bottom", pady=10)
 
-    # Example usage: load a map when needed
-    # map_holder.load_map("path/to/map.png")
-    print(selected_mode)  # Will be 'I' or 'N' after user selection
+def MainPage():
+    """Show the mode selection label and 2D/3D buttons."""
+    for widget in root.winfo_children():
+        widget.destroy()
+    root.configure(bg="black")
+    root.title("Path Planning")
+    root.geometry("800x800")
+    mode_label = tk.Label(root, text="Choose your MODE", bg="black", fg="white", font=("Bahnschrift", 36))
+    mode_label.pack(pady=50)
+
+    button_frame = tk.Frame(root, bg="black")
+    button_frame.pack(pady=20)
+
+    from twoD import ShowMap2D
+    from ThreeD import ShowMap3D
+
+    btn_2d = tk.Button(
+        button_frame,
+        text="2D",
+        bg="#222222",
+        fg="white",
+        activebackground="#444444",
+        activeforeground="white",
+        font=("Bahnschrift", 24),
+        width=10,
+        height=2,
+        borderwidth=0,
+        highlightthickness=0,
+        command=lambda: ShowMap2D(map_holder=map_holder, back_callback=MainPage)
+    )
+    btn_2d.pack(side=tk.LEFT, padx=20)
+
+    btn_3d = tk.Button(
+        button_frame,
+        text="3D",
+        bg="#222222",
+        fg="white",
+        activebackground="#444444",
+        activeforeground="white",
+        font=("Bahnschrift", 24),
+        width=10,
+        height=2,
+        borderwidth=0,
+        highlightthickness=0,
+        command=lambda: ShowMap3D(back_callback=MainPage)
+    )
+    btn_3d.pack(side=tk.LEFT, padx=20)
+
+    # Add Back button to return to the second page
+    back_btn = tk.Button(
+        root,
+        text="Back",
+        bg="#222222",
+        fg="white",
+        activebackground="#444444",
+        activeforeground="white",
+        font=("Bahnschrift", 14),
+        width=10,
+        height=1,
+        borderwidth=0,
+        highlightthickness=0,
+        command=lambda: ShowSecondPage(back_callback=ShowFirstPage, continue_callback=MainPage)
+    )
+    back_btn.pack(side="bottom", pady=20)
+
+def set_interactive():
+    global selected_mode
+    selected_mode = 'I'
+    if continue_callback:
+        continue_callback()
+
+def set_normal():
+    global selected_mode
+    selected_mode = 'N'
+    if continue_callback:
+        continue_callback()
 
 if __name__ == "__main__":
     ShowFirstPage()
