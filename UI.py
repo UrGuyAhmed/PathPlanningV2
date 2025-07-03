@@ -1,9 +1,10 @@
 import tkinter as tk
 from Start import add_start_buttons
+from MapHolder import MapHolder  
 
 
 root = tk.Tk()
-
+map_holder = MapHolder()  
 def ShowMainPage():
     """Return to the main page."""
     for widget in root.winfo_children():
@@ -26,7 +27,7 @@ def MainPage():
     from ThreeD import ShowMap3D
     add_start_buttons(
         root,
-        on_2d=lambda: ShowMap2D(back_callback=ShowMainPage),
+        on_2d=lambda: ShowMap2D(map_holder=map_holder, back_callback=ShowMainPage),  
         on_3d=lambda: ShowMap3D(back_callback=ShowMainPage)
     )
     credit_label = tk.Label(root, text="Created by Ahmed Yacine Ahriche", bg="black", fg="white", font=("Bahnschrift", 10))
@@ -46,6 +47,9 @@ def MainPage():
         highlightthickness=0
     )
     close_button.pack(side="bottom", pady=10)
+
+    # Example usage: load a map when needed
+    # map_holder.load_map("path/to/map.png")
 
 if __name__ == "__main__":
     MainPage()
