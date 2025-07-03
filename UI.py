@@ -1,7 +1,7 @@
 import tkinter as tk
 from Start import add_start_buttons
 from MapHolder import MapHolder  
-
+from SecondPage import ShowSecondPage, selected_mode
 
 root = tk.Tk()
 map_holder = MapHolder()  
@@ -10,6 +10,30 @@ def ShowMainPage():
     for widget in root.winfo_children():
         widget.destroy()
     MainPage()
+
+def ShowFirstPage():
+    for widget in root.winfo_children():
+        widget.destroy()
+    root.configure(bg="black")
+    root.title("Path Planning")
+    root.geometry("800x800")
+    title_label = tk.Label(root, text="Welcome", bg="black", fg="white", font=("Bahnschrift", 36))
+    title_label.pack(pady=50)
+    start_button = tk.Button(
+        root,
+        text="Start",
+        bg="#222222",
+        fg="white",
+        activebackground="#444444",
+        activeforeground="white",
+        font=("Bahnschrift", 24),
+        width=10,
+        height=2,
+        borderwidth=0,
+        highlightthickness=0,
+        command=lambda: ShowSecondPage(back_callback=ShowFirstPage, continue_callback=MainPage)
+    )
+    start_button.pack(pady=30)
 
 def MainPage():
     """Initialize the main page UI."""
@@ -50,7 +74,8 @@ def MainPage():
 
     # Example usage: load a map when needed
     # map_holder.load_map("path/to/map.png")
+    print(selected_mode)  # Will be 'I' or 'N' after user selection
 
 if __name__ == "__main__":
-    MainPage()
+    ShowFirstPage()
     root.mainloop()
