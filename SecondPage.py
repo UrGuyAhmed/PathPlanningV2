@@ -53,3 +53,5 @@ def ShowSecondPage(back_callback=None, continue_callback=None):
         command=set_normal
     )
     normal_btn.pack(pady=10)
+
+    print(selected_mode)  # Will be 'I' or 'N' after user selection
