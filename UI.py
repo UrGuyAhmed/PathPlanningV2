@@ -1,5 +1,4 @@
 import tkinter as tk
-from Start import add_start_buttons
 from MapHolder import MapHolder  
 from SecondPage import ShowSecondPage, selected_mode
 
@@ -117,18 +116,6 @@ def MainPage():
         command=lambda: ShowSecondPage(back_callback=ShowFirstPage, continue_callback=MainPage)
     )
     back_btn.pack(side="bottom", pady=20)
-
-def set_interactive():
-    global selected_mode
-    selected_mode = 'I'
-    if continue_callback:
-        continue_callback()
-
-def set_normal():
-    global selected_mode
-    selected_mode = 'N'
-    if continue_callback:
-        continue_callback()
 
 if __name__ == "__main__":
     ShowFirstPage()

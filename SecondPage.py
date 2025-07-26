@@ -1,5 +1,6 @@
 import tkinter as tk
 
+
 selected_mode = None  # Global variable to store the mode
 
 def ShowSecondPage(back_callback=None, continue_callback=None):
@@ -13,12 +14,14 @@ def ShowSecondPage(back_callback=None, continue_callback=None):
     def set_interactive():
         global selected_mode
         selected_mode = 'I'
+        print(f"Selected mode: {selected_mode}")  # Print after selection
         if continue_callback:
             continue_callback()
 
     def set_normal():
         global selected_mode
         selected_mode = 'N'
+        print(f"Selected mode: {selected_mode}")  # Print after selection
         if continue_callback:
             continue_callback()
 
@@ -54,4 +57,18 @@ def ShowSecondPage(back_callback=None, continue_callback=None):
     )
     normal_btn.pack(pady=10)
 
-    print(f"Selected mode: {selected_mode}")  # Will print 'Selected mode: I' or 'Selected mode: N'
+    back_btn = tk.Button(
+        root,
+        text="Back",
+        bg="#222222",
+        fg="white",
+        activebackground="#444444",
+        activeforeground="white",
+        font=("Bahnschrift", 14),
+        width=10,
+        height=1,
+        borderwidth=0,
+        highlightthickness=0,
+        command=back_callback if back_callback else root.destroy
+    )
+    back_btn.pack(side="bottom", pady=20)
