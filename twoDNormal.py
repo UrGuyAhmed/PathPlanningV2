@@ -2,6 +2,9 @@ import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk, ImageDraw
 from ImageConverter2D import image_to_maze
+from Path_Drawer import animate_path_on_image
+
+
 
 def clean_up():
     for widget in tk._default_root.winfo_children():
@@ -11,15 +14,23 @@ def ShowMap2D(map_holder=None, back_callback=None):
     clean_up()
     root = tk._default_root
 
-    label = tk.Label(root, text="Map", bg="black", fg="white", font=("Bahnschrift", 24))
-    label.pack(pady=(30, 10))  # Move map up a bit
+    # create a horizontal container: left = map, right = controls
+    main_frame = tk.Frame(root, bg="black")
+    main_frame.pack(fill="both", expand=True, padx=20, pady=10)
 
-    img_label = tk.Label(root, bg="black")
-    img_label.pack(pady=(0, 10))  # Less bottom padding to move up
+    # Left: map area
+    map_frame = tk.Frame(main_frame, bg="black")
+    map_frame.pack(side=tk.LEFT, expand=True)
 
-    # Find Path button (not packed yet)
+    label = tk.Label(map_frame, text="Map", bg="black", fg="white", font=("Bahnschrift", 24))
+    label.pack(pady=(10, 5))
+
+    img_label = tk.Label(map_frame, bg="black")
+    img_label.pack(pady=(0, 10))
+
+    # Find Path button (will be shown after upload)
     find_path_btn = tk.Button(
-        root,
+        map_frame,
         text="Find Path",
         bg="#224488",
         fg="white",
@@ -28,11 +39,11 @@ def ShowMap2D(map_holder=None, back_callback=None):
         height=1,
         borderwidth=0,
         highlightthickness=0,
-        command=lambda: print("Find Path clicked!")  # Replace with your pathfinding logic
+        command=lambda: run_algorithm() # replace with pathfinding call
     )
 
-    # Frame for Start and End buttons
-    se_btn_frame = tk.Frame(root, bg="black")
+    # Frame for Start and End buttons (under the Find Path button)
+    se_btn_frame = tk.Frame(map_frame, bg="black")
 
     start_btn = tk.Button(
         se_btn_frame,
@@ -59,11 +70,117 @@ def ShowMap2D(map_holder=None, back_callback=None):
         command=lambda: end_mode.set(True)
     )
 
+    # Right: algorithm controls (placed to the right of the map)
+    right_frame = tk.Frame(main_frame, bg="black")
+    right_frame.pack(side=tk.LEFT, anchor="n", padx=(20,0))
+
+    # Algorithm label + option menu + selected label will be packed into right_frame
+    # create placeholders (will be created in show_algo_and_sim)
+    algo_menu = None
+    selected_algo_label = None
+
     maze = None
     pil_img = None
     pil_img_orig = None  # <-- Add this line
     start_mode = tk.BooleanVar(value=False)
     end_mode = tk.BooleanVar(value=False)
+
+    # Variables to track selection
+    start_chosen = [False]
+    end_chosen = [False]
+    algo_var = tk.StringVar(value="")
+    Algorithm_Selected = [None]   # <-- store selection here
+    # sim_btn removed on purpose (UI uses Find Path button instead)
+    algo_menu = None
+
+    def run_algorithm():
+        nonlocal maze
+        alg = Algorithm_Selected[0]
+        print(f"Algorithm selected (running): {alg}")
+        if maze is None:
+            print("No maze loaded.")
+            return
+        # find start/end
+        start = end = None
+        rows, cols = maze.shape
+        for i in range(rows):
+            for j in range(cols):
+                if maze[i, j] == 'S':
+                    start = (i, j)
+                if maze[i, j] == 'E':
+                    end = (i, j)
+        if not start or not end:
+            print("Start or End missing.")
+            return
+        if alg == "Dijkstra":
+            from Dijkstra_2_D import dijkstra
+            path = dijkstra(start, end, maze)
+        elif alg == "A*":
+            try:
+                from Astar_2_D import astar
+                path = astar(start, end, maze)
+            except Exception:
+                print("A* algorithm not implemented.")
+                path = None
+        else:
+            print("Selected algorithm not supported.")
+            path = None
+
+        if path:
+            from Path_Drawer import animate_path_on_image
+            # use a thinner line and smaller node radius
+            pil_img = animate_path_on_image(pil_img_orig, img_label, path, rows, cols, color=(0,200,0), line_width=1, node_radius=3, delay=30)
+            # store pil_img back to outer scope if you rely on it later:
+            # (add `nonlocal pil_img` at top of run_algorithm)
+        else:
+            print("No path found.")
+
+    def show_algo_and_sim():
+        nonlocal algo_menu
+        if start_chosen[0] and end_chosen[0]:
+            if not algo_menu:
+                algo_label = tk.Label(
+                    right_frame,
+                    text="Choose Algorithm:",
+                    bg="black",
+                    fg="white",
+                    font=("Bahnschrift", 16)
+                )
+                algo_label.pack(pady=(10, 5))
+                algo_menu = tk.OptionMenu(right_frame, algo_var, "Dijkstra", "A*", "BFS")
+                algo_menu.config(
+                    font=("Bahnschrift", 14),
+                    bg="#222222",
+                    fg="white",
+                    activebackground="#444444",
+                    activeforeground="white",
+                    width=12,
+                    highlightthickness=0,
+                    borderwidth=0
+                )
+                algo_menu["menu"].config(
+                    font=("Bahnschrift", 12),
+                    bg="#222222",
+                    fg="white",
+                    activebackground="#444444",
+                    activeforeground="white"
+                )
+                algo_menu.pack(pady=(0, 10))
+                # display label for selected algorithm
+                selected_algo_label = tk.Label(right_frame, text="Selected Algorithm: ", bg="black", fg="#00ffcc", font=("Bahnschrift", 14))
+                selected_algo_label.pack(pady=(0, 5))
+
+            def on_algo_change(*args):
+                Algorithm_Selected[0] = algo_var.get()
+                print(f"Algorithm selected: {Algorithm_Selected[0]}")
+                # Update GUI label only (no sim_btn to enable)
+                if algo_var.get():
+                    selected_algo_label.config(text=f"Selected Algorithm: {algo_var.get()}")
+                else:
+                    selected_algo_label.config(text="Selected Algorithm: ")
+
+            # attach trace once
+            algo_var.trace_add("write", on_algo_change)
 
     def upload_action():
         nonlocal maze, pil_img, pil_img_orig  # <-- Add pil_img_orig here
@@ -111,16 +228,15 @@ def ShowMap2D(map_holder=None, back_callback=None):
                         maze[r_idx, c_idx] = 1  # or 0, depending on your maze logic
 
             maze[row, col] = 'S'
-            # Redraw the image to clear old markers
             redraw_image_with_markers()
-            # Draw new S
             draw = ImageDraw.Draw(pil_img)
             r_marker = 2
             x = int(col * w / cols)
             y = int(row * h / rows)
             draw.ellipse((x - r_marker, y - r_marker, x + r_marker, y + r_marker), fill="green")
             start_mode.set(False)
-
+            print(f"Start point set at: ({row}, {col})")  # <-- Print start coordinates
+            start_chosen[0] = True
         elif end_mode.get():
             # Remove old 'E'
             for r_idx in range(rows):
@@ -129,20 +245,21 @@ def ShowMap2D(map_holder=None, back_callback=None):
                         maze[r_idx, c_idx] = 1  # or 0, depending on your maze logic
 
             maze[row, col] = 'E'
-            # Redraw the image to clear old markers
             redraw_image_with_markers()
-            # Draw new E
             draw = ImageDraw.Draw(pil_img)
             r_marker = 2
             x = int(col * w / cols)
             y = int(row * h / rows)
             draw.ellipse((x - r_marker, y - r_marker, x + r_marker, y + r_marker), fill="red")
             end_mode.set(False)
+            print(f"End point set at: ({row}, {col})")  # <-- Print end coordinates
+            end_chosen[0] = True
+        show_algo_and_sim()
 
         tk_img = ImageTk.PhotoImage(pil_img)
         img_label.config(image=tk_img)
         img_label.image = tk_img
-        print(maze)
+        # print(maze)  # Optional: print the whole maze
 
     def redraw_image_with_markers():
         nonlocal pil_img, pil_img_orig, maze  # <-- Add pil_img_orig here

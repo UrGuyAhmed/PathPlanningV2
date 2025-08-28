@@ -1,5 +1,5 @@
 import tkinter as tk
-from twoD import ShowMap2D
+from twoDNormal import ShowMap2D
 
 class MapHolder:
     def __init__(self):

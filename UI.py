@@ -5,6 +5,15 @@ from SecondPage import ShowSecondPage, selected_mode
 root = tk.Tk()
 map_holder = MapHolder()  
 
+# make the window fullscreen / maximized on startup (Windows: zoomed)
+try:
+    root.state("zoomed")
+except Exception:
+    try:
+        root.attributes("-fullscreen", True)
+    except Exception:
+        pass
+
 def ShowMainPage():
     """Return to the main page."""
     for widget in root.winfo_children():
@@ -16,7 +25,8 @@ def ShowFirstPage():
         widget.destroy()
     root.configure(bg="black")
     root.title("Path Planning")
-    root.geometry("800x800")
+    # window is already maximized; do not force a fixed geometry
+    root.update_idletasks()
     title_label = tk.Label(root, text="Path Planning", bg="black", fg="white", font=("Bahnschrift", 36))
     title_label.pack(pady=50)
     start_button = tk.Button(
@@ -58,14 +68,15 @@ def MainPage():
         widget.destroy()
     root.configure(bg="black")
     root.title("Path Planning")
-    root.geometry("800x800")
+    # keep the maximized state — avoid resetting geometry
+    root.update_idletasks()
     mode_label = tk.Label(root, text="Choose your MODE", bg="black", fg="white", font=("Bahnschrift", 36))
     mode_label.pack(pady=50)
 
     button_frame = tk.Frame(root, bg="black")
     button_frame.pack(pady=20)
 
-    from twoD import ShowMap2D
+    from twoDNormal import ShowMap2D
     from ThreeD import ShowMap3D
 
     btn_2d = tk.Button(
