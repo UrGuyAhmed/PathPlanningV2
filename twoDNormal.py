@@ -22,7 +22,7 @@ def ShowMap2D(map_holder=None, back_callback=None):
     map_frame = tk.Frame(main_frame, bg="black")
     map_frame.pack(side=tk.LEFT, expand=True)
 
-    label = tk.Label(map_frame, text="Map", bg="black", fg="white", font=("Bahnschrift", 24))
+    label = tk.Label(map_frame, text="Normal Map", bg="black", fg="white", font=("Bahnschrift", 24))
     label.pack(pady=(10, 5))
 
     img_label = tk.Label(map_frame, bg="black")
